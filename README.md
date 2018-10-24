@@ -8,5 +8,10 @@ This project came about from wanting to find a way to handle/manage task assignm
 ## Plans
 Currently this project serves as a proof of concept and an introduction to GUI design using JavaFX. In the near future I would like to add a timeline to the application interface. Implement a user login page and add a database engine to the application. I would also like to design/implement a logger to assist with troubleshooting/debugging maybe create with a log viewer as well.
 
+## Tools & Language
+Language: Java<br>
+IDE: Eclipse<br>
+Tools: Scene Builder 10<br>
+
 ### Contact Info
 Email: <chou.thao.1993@gmail.com>
