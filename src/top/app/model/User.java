@@ -70,7 +70,7 @@ public class User {
 	
 	
 	/**
-	 * Override the toString method to format the User
+	 * Overrides the toString method to format the User
 	 * into a String.
 	 * 
 	 * @return the User as a string
@@ -78,5 +78,30 @@ public class User {
 	@Override
 	public String toString() {
 		return getFirstName() + " " + getLastName();
+	}
+	
+	/**
+	 * Overrides the equal method to check if an Object
+	 * o is equal to the user.
+	 * 
+	 * @param o the Object to check if the user is equal
+	 *          to
+	 */
+	@Override
+	public boolean equals(Object o) {
+		// check if same object
+		if (o == this) return true;
+		
+		// check if o is a User object
+		if (!(o instanceof User)) return false;
+		
+		// typecast o to a User object and check if
+		// it's equal to the user
+		User object = (User) o;
+		if (object.firstNameProperty().equals(firstName) &&
+				object.lastNameProperty().equals(lastName)) {
+			return true;
+		}
+		return false;
 	}
 }

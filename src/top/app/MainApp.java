@@ -26,6 +26,8 @@ public class MainApp extends Application {
 	private ObservableList<TaskItem> taskItemData =  FXCollections.observableArrayList();
 	private ObservableList<User> users = FXCollections.observableArrayList();
 	
+	private User currentUser;
+	
 	/**
 	 * Constructor with sample data for the ObservableList
 	 * taskListData.
@@ -59,6 +61,9 @@ public class MainApp extends Application {
 		taskItemData.get(0).assignANewUser(users.get(4));
 		taskItemData.get(1).assignANewUser(users.get(5));
 		taskItemData.get(2).assignANewUser(users.get(1));
+		
+		// set current user
+		currentUser = users.get(5);
 	}
 	
 	/**

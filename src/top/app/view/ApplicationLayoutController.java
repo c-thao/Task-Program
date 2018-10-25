@@ -1,5 +1,7 @@
 package top.app.view;
 
+import java.util.ArrayList;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -11,7 +13,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.TextArea;
 import top.app.MainApp;
 import top.app.model.Task;
 import top.app.model.TaskItem;
@@ -46,14 +48,19 @@ public class ApplicationLayoutController {
 	private Label userLabel;
 	
 	@FXML
-	private TextField descriptionField;
+	private TextArea descriptionField;
 	
 	private ObservableList<User> users = FXCollections.observableArrayList();
 	
+	/*@FXML
+	private ComboBox<String> assignUserBox = new ComboBox<String>();
 	@FXML
-	private ComboBox<User> assignUserBox;
+	private ComboBox<String> unassignUserBox = new ComboBox<String>();*/
+	
 	@FXML
-	private ComboBox<User> unassignUserBox;
+	private ComboBox<User> assignUserBox = new ComboBox<User>();
+	@FXML
+	private ComboBox<User> unassignUserBox = new ComboBox<User>();
 	
 	@FXML
 	private DatePicker selectEndDate;
@@ -123,6 +130,9 @@ public class ApplicationLayoutController {
 			//startDateLabel.setText(taskItem.getStartDate());
 			//endDateLabel.setText(taskItem.getEndDate());
 			
+			listAssignableUsers(taskItem);
+			listUnassignableUsers(taskItem);
+			
 			descriptionField.setText(taskItem.getTask().getDescription());
 		} else {
 			System.out.println("Clearing application details.");
@@ -151,8 +161,8 @@ public class ApplicationLayoutController {
 			taskItemTable.getItems().remove(selectedIndex);
 		} else {
 			System.out.println("No task were selected to be deleted.");
-	        Alert alert = new Alert(AlertType.WARNING);
-	        alert.setTitle("Error");
+	        Alert alert = new Alert(AlertType.ERROR);
+	        alert.setTitle("Selection Error");
 	        alert.setHeaderText("Unable to process delete.");
 	        alert.setContentText("No task were selected. Unable to process delete.");
 	        alert.showAndWait();
@@ -166,4 +176,89 @@ public class ApplicationLayoutController {
 		System.out.println("Creating a new task.");
 	}
 	
+	/**
+	 * This function handles the cancel button.
+	 */
+	public void handleCancel() {
+		System.out.println("Cancelling task management transaction.");
+		
+	}
+	
+	/**
+	 * This function handles the apply button.
+	 */
+	public void handleApply() {
+		// get currently selected task item
+		TaskItem taskItem = taskItemTable.getSelectionModel().getSelectedItem();
+		System.out.println("Applying task management transaction.");
+		
+		// check if a user has been chosen to be assigned to the task item
+		// and add them to the task item
+		if (assignUserBox.getSelectionModel().getSelectedItem() != null) {
+			User assignedUser = assignUserBox.getSelectionModel().getSelectedItem();
+			System.out.println("Assigned user " + assignedUser.toString() + " to the current task.");
+			taskItem.assignANewUser(assignedUser);
+		}
+		
+		// check if a user has been chosen to be unassign from the task item
+		// and remove them from the task item
+		if (unassignUserBox.getSelectionModel().getSelectedItem() != null) {
+			User unassignUser = unassignUserBox.getSelectionModel().getSelectedItem();
+			System.out.println("Unassigned user " + unassignUser.toString() + " from the current task.");
+			taskItem.unassignACurrentUser(unassignUser);
+		}
+		
+		// update the labels and fields of the application layout
+		showApplicationDetails(taskItem);
+	}
+	
+	/**
+	 * This function handles the list of users available in
+	 * the combo box assignUserBox.
+	 */
+	public void listAssignableUsers(TaskItem taskItem) {
+		System.out.println("Gathering list of users avaiable to assign to the task.");
+		// clear out any content currently inside of the combobox
+		if (assignUserBox.getItems().size() > 0) {
+			assignUserBox.getItems().removeAll(assignUserBox.getItems());
+		}
+		
+		// get all available users that are currently not assigned to the task
+		//ObservableList<String> assignableUsers = FXCollections.observableArrayList();
+		ObservableList<User> assignableUsers = FXCollections.observableArrayList();
+		ArrayList<User> assignedUsers = taskItem.getAssignedUsers();
+		for (int i = 0; i < users.size(); i++) {
+			if (!(assignedUsers.contains(users.get(i)))) {
+				if (!(users.get(i).equals(taskItem.getCreator()))) {
+					//assignableUsers.add(users.get(i).toString());
+					assignableUsers.add(users.get(i));
+				}
+			}
+		}
+		
+		assignUserBox.setItems(assignableUsers);
+	}
+	
+	/**
+	 * This function handles unassigning a user from the list
+	 * of assignedUsers in the TaskItem taskItem.
+	 */
+	public void listUnassignableUsers(TaskItem taskItem) {
+		System.out.println("Gathering list of users avaiable to unassign from the task.");
+		// clear out any content currently inside of the combobox
+		if (unassignUserBox.getItems().size() > 0) {
+			unassignUserBox.getItems().removeAll(unassignUserBox.getItems());
+		}
+		
+		// get all the users assigned to the task
+		//ObservableList<String> unassignableUsers = FXCollections.observableArrayList();
+		ObservableList<User> unassignableUsers = FXCollections.observableArrayList();
+		ArrayList<User> assignedUsers = taskItem.getAssignedUsers();
+		for (int i = 0; i < assignedUsers.size(); i++) {
+			//unassignableUsers.add(assignedUsers.get(i).toString());
+			unassignableUsers.add(assignedUsers.get(i));
+		}
+		
+		unassignUserBox.setItems(unassignableUsers);
+	}
 }
