@@ -11,12 +11,14 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import top.app.model.Task;
 import top.app.model.TaskItem;
 import top.app.model.User;
 import top.app.view.ApplicationLayoutController;
 import top.app.view.RootLayoutController;
+import top.app.view.TaskItemDialogController;
 
 public class MainApp extends Application {
 	
@@ -64,6 +66,7 @@ public class MainApp extends Application {
 		
 		// set current user
 		currentUser = users.get(5);
+		System.out.println("Current User: " + currentUser.toString());
 	}
 	
 	/**
@@ -91,7 +94,6 @@ public class MainApp extends Application {
 		// enable primaryStage to display/show
 		System.out.println("Displaying the root layout on the Primary stage now.");
 		primaryStage.show();
-		
 	}
 	
 	/**
@@ -151,8 +153,7 @@ public class MainApp extends Application {
 	 */
 	public void displayApplicationLayout() {
 		try {
-			// load a fxml file layout and 
-			// load the layout into rootLayout
+			// load a fxml file for the application layout
 			System.out.println("Loading the application layout from a fxml file...");
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(MainApp.class.
@@ -174,11 +175,46 @@ public class MainApp extends Application {
 	}
 	
 	/**
+	 * Opens the task item dialog.
+	 */
+	public void displayTaskItemDialog (TaskItem taskItem) {
+		try {
+			System.out.println("Loading the task item dialog from a fxml file...");
+            // load a fxml file for the task item dialog
+			FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(MainApp.class.
+					getResource("view/TaskItemDialog.fxml"));
+			AnchorPane testItemPage = (AnchorPane) loader.load();
+			System.out.println("Task item dialog loaded.");
+			
+			// Create the test item dialog Stage
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("New Task Item");
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.initOwner(primaryStage);
+            Scene scene = new Scene(testItemPage);
+            dialogStage.setScene(scene);
+            
+            // setup the dialogStage and set the taskItem into the controller
+            TaskItemDialogController controller = loader.getController();
+            controller.setCreator(currentUser);
+            controller.setDialogStage(dialogStage);
+            controller.setTaskItem(taskItem);
+            
+            // Show the dialog and wait until the user closes it
+            dialogStage.showAndWait();
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
 	 * Returns the ObservableList taskItemData.
 	 * 
 	 * @return the ObservableList taskItemData
 	 */
-	public ObservableList<TaskItem> getTaskItemData() {
+ 	public ObservableList<TaskItem> getTaskItemData() {
 		return taskItemData;
 	}
 	
