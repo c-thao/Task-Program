@@ -1,5 +1,6 @@
 package top.app.view;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 import javafx.collections.FXCollections;
@@ -14,10 +15,13 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
+import javafx.util.StringConverter;
 import top.app.MainApp;
 import top.app.model.Task;
 import top.app.model.TaskItem;
 import top.app.model.User;
+import top.app.util.AlertUtil;
+import top.app.util.DateUtil;
 
 /**
  * This is a controller for the application layout.
@@ -52,15 +56,10 @@ public class ApplicationLayoutController {
 	
 	private ObservableList<User> users = FXCollections.observableArrayList();
 	
-	/*@FXML
-	private ComboBox<String> assignUserBox = new ComboBox<String>();
 	@FXML
-	private ComboBox<String> unassignUserBox = new ComboBox<String>();*/
-	
+	private ComboBox<User> assignUserBox;// = new ComboBox();
 	@FXML
-	private ComboBox<User> assignUserBox = new ComboBox<User>();
-	@FXML
-	private ComboBox<User> unassignUserBox = new ComboBox<User>();
+	private ComboBox<User> unassignUserBox;// = new ComboBox();
 	
 	@FXML
 	private DatePicker selectEndDate;
@@ -70,7 +69,32 @@ public class ApplicationLayoutController {
 	/**
 	 * Default Constructor.
 	 */
-	public ApplicationLayoutController() {}
+	public ApplicationLayoutController() {
+		assignUserBox = new ComboBox();
+		unassignUserBox = new ComboBox();
+		
+		// initializes the DatePicker element
+		selectEndDate = new DatePicker();
+		
+		// initializes the converter for the DatePicker element
+		StringConverter<LocalDate> converter = new StringConverter<LocalDate>() {
+			@Override
+			public String toString(LocalDate date) {
+				return DateUtil.formatDate(date);
+			}
+			
+			@Override
+			public LocalDate fromString(String date) {
+				return DateUtil.parse(date);
+			}
+			
+			
+		};
+		selectEndDate.setConverter(converter);
+		selectEndDate.setPromptText("dd-MMMM-yyyy");
+		
+		
+	}
 	
 	/**
 	 * Initializes the application layout.
@@ -122,30 +146,46 @@ public class ApplicationLayoutController {
 	public void showApplicationDetails(TaskItem taskItem) {
 		if (taskItem != null) {
 			System.out.println("Displaying application details for " + taskItem.getTaskName() + ".");
-			nameLabel.setText(taskItem.getTaskName());
+			
+			// updates creator, name, and user labels
+			System.out.println("Updating creator, task name, and assigned users labels.");
 			creatorLabel.setText(taskItem.getCreatorName());
+			nameLabel.setText(taskItem.getTaskName());
 			userLabel.setText(taskItem.getAssignedUsersName());
 			
-			// TODO: fix LocalDate to be converted into a string
-			//startDateLabel.setText(taskItem.getStartDate());
-			//endDateLabel.setText(taskItem.getEndDate());
+			// converts the dates into a string and updates the date
+			// label
+			System.out.println("Updating start and end date labels.");
+			if (taskItem.getStartDate() != null) {
+				String startDateString = DateUtil.formatDate(taskItem.getStartDate());
+				startDateLabel.setText(startDateString);
+			} else {
+				startDateLabel.setText("N/A");
+			}
+			if (taskItem.getEndDate() != null) {
+				String endDateString = DateUtil.formatDate(taskItem.getEndDate());
+				endDateLabel.setText(endDateString);
+			} else {
+				endDateLabel.setText("UNDEF");
+			}
 			
+			// updates description field
+			System.out.println("Updating the task description field.");
+			descriptionField.setText(taskItem.getTask().getDescription());
+			
+			// updates the combobox with list of users
+			System.out.println("Updating list inside the comboboxes.");
 			listAssignableUsers(taskItem);
 			listUnassignableUsers(taskItem);
-			
-			descriptionField.setText(taskItem.getTask().getDescription());
 		} else {
+			// default state with no taskitem fields
 			System.out.println("Clearing application details.");
 			nameLabel.setText("N/A");
-			creatorLabel.setText("undef");
-			userLabel.setText("undef");
-			
-			// TODO: fix LocalDate to be converted into a string
-			//startDateLabel.setText(taskItem.getStartDate());
-			//endDateLabel.setText(taskItem.getEndDate());
-			
+			creatorLabel.setText("UNDEF");
+			userLabel.setText("N/A");
+			startDateLabel.setText("N/A");
+			endDateLabel.setText("UNDEF");
 			descriptionField.setText("N/A");
-			
 		}
 	}
 	
@@ -161,11 +201,9 @@ public class ApplicationLayoutController {
 			taskItemTable.getItems().remove(selectedIndex);
 		} else {
 			System.out.println("No task were selected to be deleted.");
-	        Alert alert = new Alert(AlertType.ERROR);
-	        alert.setTitle("Selection Error");
-	        alert.setHeaderText("Unable to process delete.");
-	        alert.setContentText("No task were selected. Unable to process delete.");
-	        alert.showAndWait();
+	        AlertUtil.alertUser("ERROR",
+	        		"Unable to process delete.", 
+	        		"No task were selected. Unable to process delete.");
 		}
 	}
 	
@@ -174,6 +212,9 @@ public class ApplicationLayoutController {
 	 */
 	public void handleNew() {
 		System.out.println("Creating a new task.");
+		TaskItem taskItem = new TaskItem();
+		mainApp.displayTaskItemDialog(taskItem);
+		mainApp.getTaskItemData().add(taskItem);
 	}
 	
 	/**
@@ -208,6 +249,19 @@ public class ApplicationLayoutController {
 			taskItem.unassignACurrentUser(unassignUser);
 		}
 		
+		// checks to see if the end date is available
+		if (selectEndDate.getValue() != null) { 
+			if (DateUtil.compare(selectEndDate.getValue(),taskItem.getStartDate()) > -1) {
+				LocalDate endDate = selectEndDate.getValue();
+				System.out.println("End date of task set to " + DateUtil.formatDate(endDate));
+				taskItem.setEndDate(endDate);
+			} else {
+	        AlertUtil.alertUser("ERROR",
+	        		"Incorrect date selected.", 
+	        		"Choose only a date from today and onwards for the end date.");
+			}
+		}
+		
 		// update the labels and fields of the application layout
 		showApplicationDetails(taskItem);
 	}
@@ -224,13 +278,11 @@ public class ApplicationLayoutController {
 		}
 		
 		// get all available users that are currently not assigned to the task
-		//ObservableList<String> assignableUsers = FXCollections.observableArrayList();
 		ObservableList<User> assignableUsers = FXCollections.observableArrayList();
 		ArrayList<User> assignedUsers = taskItem.getAssignedUsers();
 		for (int i = 0; i < users.size(); i++) {
 			if (!(assignedUsers.contains(users.get(i)))) {
 				if (!(users.get(i).equals(taskItem.getCreator()))) {
-					//assignableUsers.add(users.get(i).toString());
 					assignableUsers.add(users.get(i));
 				}
 			}
@@ -251,11 +303,9 @@ public class ApplicationLayoutController {
 		}
 		
 		// get all the users assigned to the task
-		//ObservableList<String> unassignableUsers = FXCollections.observableArrayList();
 		ObservableList<User> unassignableUsers = FXCollections.observableArrayList();
 		ArrayList<User> assignedUsers = taskItem.getAssignedUsers();
 		for (int i = 0; i < assignedUsers.size(); i++) {
-			//unassignableUsers.add(assignedUsers.get(i).toString());
 			unassignableUsers.add(assignedUsers.get(i));
 		}
 		

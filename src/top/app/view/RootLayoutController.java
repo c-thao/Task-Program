@@ -4,6 +4,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import top.app.MainApp;
+import top.app.util.AlertUtil;
 
 /**
  * This is the controller for the root layout.
@@ -82,13 +83,10 @@ public class RootLayoutController {
     @FXML
     private void handleAbout() {
 		System.out.println("Accessing application information...");
-        Alert alert = new Alert(AlertType.INFORMATION);
-        alert.setTitle("Task Application");
-        alert.setHeaderText("About");
-        alert.setContentText("Author: Chou Thao\n"
+        AlertUtil.alertUser("INFO", "About",
+        		"Author: Chou Thao\n"
         		+ "Email: chou.thao.1993@gmail.com\n"
         		+ "Website: https://github.com/c-thao");
-        alert.showAndWait();
     }
 	
 	
