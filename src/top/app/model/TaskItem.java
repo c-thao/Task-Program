@@ -9,15 +9,15 @@ import java.util.ArrayList;
  *
  */
 public class TaskItem extends Task{
-	//private final Task task;
-	private final User creator;
-	private ArrayList<User> assignedUsers = new ArrayList<User>();
+	private User creator;
+	private ArrayList<User> assignedUsers;
 	
 	/**
 	 * Default constructor.
 	 */
 	public TaskItem() {
-		this(null, null);
+		creator = new User();
+		assignedUsers = new ArrayList<User>();
 	};
 	
 	/**
@@ -32,6 +32,7 @@ public class TaskItem extends Task{
 		this.creator = creator;
 		System.out.print(creator.toString() + " has created a new task ");
 		System.out.print(task.getName() + "\n");
+		assignedUsers = new ArrayList<User>();
 	}
 	
 	/**
@@ -47,6 +48,7 @@ public class TaskItem extends Task{
 		this.creator = creator;
 		System.out.print(creator.toString() + " has created a new task ");
 		System.out.print(task.getName() + " and assigned user ");
+		assignedUsers = new ArrayList<User>();
 		assignedUsers.add(user);
 		System.out.print(user.toString());
 		System.out.print("\n");
@@ -71,12 +73,42 @@ public class TaskItem extends Task{
 	}
 	
 	/**
+	 * Sets the name and description.
+	 * 
+	 * @param task the Task to assign the name and description.
+	 */
+	public void setTask(Task task) {
+		this.setName(task.getName());
+		this.setDescription(task.getDescription());
+	}
+	
+	/**
+	 * Sets the name and description.
+	 * 
+	 * @param name        the String to assign to the name
+	 * @param description the String to assign to the description
+	 */
+	public void setTask(String name, String description) {
+		this.setName(name);
+		this.setDescription(description);
+	}
+	
+	/**
 	 * Returns the creator.
 	 * 
 	 * @return the creator
 	 */
 	public User getCreator() {
 		return creator;
+	}
+	
+	/**
+	 * Sets the creator to the argument creator.
+	 * 
+	 * @param creator the User to assign to the creator
+	 */
+	public void setCreator(User creator) {
+		this.creator = creator;
 	}
 	
 	/**
@@ -126,12 +158,21 @@ public class TaskItem extends Task{
 	 */
 	public String getAssignedUsersName() {
 		String userList = "";
+		// construct a string of all assigned users
+		// name
 		for (int i = 0; i<assignedUsers.size(); i++) {
 			userList += assignedUsers.get(i).toString();
 			if (i != assignedUsers.size() - 1) {
 				userList += ", ";
 			}
 		}
+		
+		// check to see if userList has been constructed with
+		// names, else specify none assigned
+		if (userList == null || userList.length() == 0) {
+			userList = "None Assigned";
+		}
+		
 		return userList;
 	}
 }

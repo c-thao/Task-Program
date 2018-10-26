@@ -15,9 +15,8 @@ import javafx.beans.property.StringProperty;
  */
 public class Task {
 	
-	private final StringProperty name;
 	private final ObjectProperty<LocalDate> startDate;
-	
+	private StringProperty name;
 	private StringProperty description;
 	private ObjectProperty<LocalDate> endDate;
 	
@@ -25,7 +24,10 @@ public class Task {
 	 * Default Constructor.
 	 */
 	public Task() {
-		this(null, null);
+		this.name = new SimpleStringProperty();
+		this.description = new SimpleStringProperty();
+		startDate = new SimpleObjectProperty<LocalDate>(LocalDate.now());
+		endDate = new SimpleObjectProperty<LocalDate>();
 	}
 	
 	/**
@@ -40,6 +42,7 @@ public class Task {
 		this.name = new SimpleStringProperty(name);
 		this.description = new SimpleStringProperty(description);
 		startDate = new SimpleObjectProperty<LocalDate>(LocalDate.now());
+		endDate = new SimpleObjectProperty<LocalDate>();
 	}
 	
 	/**
@@ -49,6 +52,15 @@ public class Task {
 	 */
 	public String getName() {
 		return name.get();
+	}
+	
+	/**
+	 * Sets the name to the argument name.
+	 * 
+	 * @param name the String to assign to the name
+	 */
+	public void setName(String name) {
+		this.name.set(name);
 	}
 	
 	/**
@@ -78,18 +90,13 @@ public class Task {
 		return description;
 	}
 	
+	/**
+	 * Sets the description.
+	 * 
+	 * @param description string to assign to the description
+	 */
 	public void setDescription(String description) {
 		this.description.set(description);
-	}
-	
-	/**
-	 * Returns the startDate as a string.
-	 * 
-	 * @return the startData as a string
-	 */
-	// TODO: need to workout for localdate to work correctly
-	public LocalDate getStartDate() {
-		return startDate.get();
 	}
 	
 	/**
@@ -100,15 +107,14 @@ public class Task {
 	public ObjectProperty<LocalDate> StartDateProperty() {
 		return startDate;
 	}
-
+	
 	/**
-	 * Returns the endDate as a string.
+	 * Returns the startDate as a LocalDate.
 	 * 
-	 * @return endData as a string
+	 * @return the startDate as a LocalDate
 	 */
-	// TODO: need to workout for localdate to work correctly
-	public LocalDate getEndDate() {
-		return endDate.get();
+	public LocalDate getStartDate() {
+		return startDate.get();
 	}
 	
 	/**
@@ -118,6 +124,15 @@ public class Task {
 	 */
 	public ObjectProperty<LocalDate> EndDateProperty() {
 		return endDate;
+	}
+	
+	/**
+	 * Returns the endDate as a LocalDate.
+	 * 
+	 * @return the endDate as a LocalDate
+	 */
+	public LocalDate getEndDate() {
+		return endDate.get();
 	}
 	
 	/**

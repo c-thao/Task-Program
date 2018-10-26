@@ -10,14 +10,15 @@ import javafx.beans.property.StringProperty;
  *
  */
 public class User {
-	private final StringProperty firstName;
-	private final StringProperty lastName;
+	private StringProperty firstName;
+	private StringProperty lastName;
 	
 	/**
 	 * Default Constructor.
 	 */
 	public User () {
-		this(null,null);
+		this.firstName = new SimpleStringProperty();
+		this.lastName = new SimpleStringProperty();
 	}
 	
 	/**
@@ -42,6 +43,15 @@ public class User {
 	}
 	
 	/**
+	 * Sets the firstName to the argument firstName.
+	 * 
+	 * @param firstName the String to assign to the firstName
+	 */
+	public void setFirstName(String firstName) {
+		this.firstName.set(firstName);
+	}
+	
+	/**
 	 * Returns the firstName.
 	 * 
 	 * @return the firstName
@@ -57,6 +67,15 @@ public class User {
 	 */
 	public String getLastName() {
 		return lastName.get();
+	}
+	
+	/**
+	 * Sets the lastName to the argument lastName.
+	 * 
+	 * @param lastName the String to assign to the lastName
+	 */
+	public void setLastName(String lastName) {
+		this.lastName.set(lastName);
 	}
 	
 	/**
